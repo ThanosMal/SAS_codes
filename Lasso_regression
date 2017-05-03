@@ -1,0 +1,26 @@
+# Lasso Regression with SAS
+
+
+LIBNAME mydata “/courses/d1406ae5ba27fe300 ” access=readonly;
+
+DATA new; set mydata.nesarc_pds;
+
+if MAJORDEP12=0 then MAJORDEP12=2;
+if GAMB12DX=0 then GAMB12DX=2;
+if GAMBP12DX=0 then GAMBP12DX=2;
+
+if cmiss(of _all_) then delete;
+run;
+
+ods graphics on;
+
+proc surveyselect data=new out=traintest seed = 123
+samprate=0.7 method=srs outall;
+run;  
+
+proc glmselect data=traintest plots=all seed=123;
+    partition ROLE=selected(train=‘1’ test='0’);
+
+    model MAJORDEP12 =S10Q1A1 S3BQ1A5 S10Q1A27 S10Q1A35 S10Q1A56 S10Q1A61
+GAMB12DX GAMBP12DX S1Q2D S1Q231 S1Q232 S1Q235 S1Q2310/selection=lar(choose=cv stop=none) cvmethod=random(10);
+run;
