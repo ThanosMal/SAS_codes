@@ -1,0 +1,16 @@
+LIBNAME mydata “/courses/d1406ae5ba27fe300 ” access=readonly;
+
+DATA new; set mydata.nesarc_pds;
+
+if MAJORDEP12=0 then MAJORDEP12=2;
+if GAMB12DX=0 then GAMB12DX=2;
+if GAMBP12DX=0 then GAMBP12DX=2;
+
+PROC SORT; BY IDNUM;
+
+PROC HPFOREST;
+target MAJORDEP12/level=nominal;
+input S10Q1A1 S3BQ1A5 S10Q1A27 S10Q1A35 S10Q1A56 S10Q1A61
+GAMB12DX GAMBP12DX S1Q2D S1Q231 S1Q232 S1Q235 S1Q2310/level=nominal;
+
+run;
